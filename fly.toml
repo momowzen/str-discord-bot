@@ -1,0 +1,18 @@
+app = "str-discord-bot"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  DEFAULT_LANG = "en"
+
+[deploy]
+  strategy = "immediate"
+
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
