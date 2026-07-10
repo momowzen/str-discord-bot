@@ -28,14 +28,14 @@ module.exports = {
   async execute(interaction) {
     const sub = interaction.options.getSubcommand();
     if (sub === 'off') {
-      interaction.client.db.disableChannelAutoTranslate(interaction.channelId);
+      await interaction.client.db.disableChannelAutoTranslate(interaction.channelId);
       return interaction.reply('Auto-translate disabled for this channel.');
     }
     const lang = interaction.options.getString('language');
     if (!languages[lang]) {
       return interaction.reply({ content: `Unsupported language code: \`${lang}\`.`, ephemeral: true });
     }
-    interaction.client.db.setChannelAutoTranslate(interaction.channelId, interaction.guildId, lang);
+    await interaction.client.db.setChannelAutoTranslate(interaction.channelId, interaction.guildId, lang);
     await interaction.reply(`Auto-translate enabled for this channel → **${getLanguageName(lang)}** (${lang}).`);
   },
 };

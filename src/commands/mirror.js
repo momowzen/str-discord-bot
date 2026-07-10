@@ -19,11 +19,11 @@ module.exports = {
     const sub = interaction.options.getSubcommand();
 
     if (sub === 'unlink') {
-      const mirror = interaction.client.db.getMirrorForChannel(interaction.channelId);
+      const mirror = await interaction.client.db.getMirrorForChannel(interaction.channelId);
       if (!mirror) {
         return interaction.reply({ content: 'This channel is not linked to any mirror.', ephemeral: true });
       }
-      interaction.client.db.removeMirrorLink(interaction.channelId);
+      await interaction.client.db.removeMirrorLink(interaction.channelId);
       return interaction.reply('Mirror link removed from this channel.');
     }
 
@@ -35,13 +35,13 @@ module.exports = {
       return interaction.reply({ content: 'Cannot mirror a channel to itself.', ephemeral: true });
     }
 
-    const existingA = interaction.client.db.getMirrorForChannel(interaction.channelId);
-    const existingB = interaction.client.db.getMirrorForChannel(target.id);
+    const existingA = await interaction.client.db.getMirrorForChannel(interaction.channelId);
+    const existingB = await interaction.client.db.getMirrorForChannel(target.id);
     if (existingA || existingB) {
       return interaction.reply({ content: 'One or both channels are already mirrored. Unlink first.', ephemeral: true });
     }
 
-    interaction.client.db.createMirrorLink(
+    await interaction.client.db.createMirrorLink(
       interaction.channelId, interaction.guildId,
       target.id, target.guildId
     );

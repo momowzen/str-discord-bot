@@ -8,9 +8,9 @@ module.exports = {
     if (message.author.bot) return;
     if (!message.guild) return;
 
-    const channelSetting = client.db.getChannelSetting(message.channelId);
-    const mirror = client.db.getMirrorForChannel(message.channelId);
-    const guildSetting = client.db.getGuildSetting(message.guildId);
+    const channelSetting = await client.db.getChannelSetting(message.channelId);
+    const mirror = await client.db.getMirrorForChannel(message.channelId);
+    const guildSetting = await client.db.getGuildSetting(message.guildId);
     console.log(`Settings: channel=${message.channelId} autoTranslate=${channelSetting?.auto_translate_lang} guildDefault=${guildSetting.default_lang}`);
 
     // Gather text — message content + OCR from attached images
@@ -53,8 +53,8 @@ module.exports = {
       const targetChannel = await client.channels.fetch(mirror.targetChannel).catch(() => null);
       if (!targetChannel) return;
 
-      const targetGuildSetting = client.db.getGuildSetting(mirror.targetGuild);
-      const targetChannelSetting = client.db.getChannelSetting(mirror.targetChannel);
+      const targetGuildSetting = await client.db.getGuildSetting(mirror.targetGuild);
+      const targetChannelSetting = await client.db.getChannelSetting(mirror.targetChannel);
       const targetLang = targetChannelSetting?.auto_translate_lang || targetGuildSetting.default_lang;
 
       const detected = await detectLanguage(textToTranslate);

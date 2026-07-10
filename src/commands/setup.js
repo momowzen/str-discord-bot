@@ -27,7 +27,7 @@ module.exports = {
     if (!languages[lang]) {
       return interaction.reply({ content: `Unsupported language code: \`${lang}\`.`, ephemeral: true });
     }
-    interaction.client.db.setGuildLang(interaction.guildId, lang);
+    await interaction.client.db.setGuildLang(interaction.guildId, lang);
     await interaction.reply(`Default language set to **${getLanguageName(lang)}** (${lang}).`);
   },
 };
