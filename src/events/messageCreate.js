@@ -2,6 +2,19 @@ const { translateText, detectLanguage } = require('../services/translator');
 const { extractTextFromImage } = require('../services/ocr');
 const { getFlag } = require('../utils/languages');
 
+const MENTION_RE = /@(everyone|here)|<[@#][!&]?\d+>|<a?:\w+:\d+>/g;
+
+function preserveMentions(text, store) {
+  return text.replace(MENTION_RE, m => {
+    const idx = store.push(m);
+    return `\x00MENTION_${idx - 1}\x00`;
+  });
+}
+
+function restoreMentions(text, store) {
+  return text.replace(/\x00MENTION_(\d+)\x00/g, (_, i) => store[+i] || '');
+}
+
 module.exports = {
   name: 'messageCreate',
   async execute(message, client) {
@@ -11,7 +24,8 @@ module.exports = {
     const channelSetting = await client.db.getChannelSetting(message.channelId);
     if (!channelSetting?.auto_translate_lang) return;
 
-    let textToTranslate = message.content;
+    const mentions = [];
+    let textToTranslate = preserveMentions(message.content, mentions);
 
     const imageAttachments = message.attachments.filter(a => a.contentType?.startsWith('image/'));
     if (imageAttachments.size > 0) {
@@ -35,10 +49,11 @@ module.exports = {
     if (langs.length === 1 && detected !== langs[0]) {
       const result = await translateText(textToTranslate, langs[0], detected);
       if (result.text && result.text !== textToTranslate) {
+        const translated = restoreMentions(result.text, mentions);
         await message.reply({
           embeds: [{
             color: 0x5865F2,
-            description: `${getFlag(langs[0])}\n${result.text}`,
+            description: `${getFlag(langs[0])}\n${translated}`,
           }],
           allowedMentions: { repliedUser: false },
         });
@@ -49,7 +64,7 @@ module.exports = {
         if (targetLang === detected) continue;
         const result = await translateText(textToTranslate, targetLang, detected);
         if (result.text && result.text !== textToTranslate) {
-          parts.push(`${getFlag(targetLang)}\n${result.text}`);
+          parts.push(`${getFlag(targetLang)}\n${restoreMentions(result.text, mentions)}`);
         }
       }
       if (parts.length > 0) {
