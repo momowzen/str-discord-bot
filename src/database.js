@@ -121,6 +121,22 @@ module.exports = {
       save(data);
     }
   },
+  async setChannelTriad(channelId, guildId, langs) {
+    const str = langs.join(',');
+    if (TURSO_URL) {
+      await ensureTables();
+      await turso(
+        'INSERT OR REPLACE INTO channel_settings (channel_id, guild_id, auto_translate_lang) VALUES (?, ?, ?)',
+        [channelId, guildId, str]
+      );
+      return;
+    }
+    const data = load();
+    if (!data.channels[channelId]) data.channels[channelId] = {};
+    data.channels[channelId].guild_id = guildId;
+    data.channels[channelId].auto_translate_lang = str;
+    save(data);
+  },
   async createMirrorLink(channelA, guildA, channelB, guildB) {
     if (TURSO_URL) {
       await ensureTables();

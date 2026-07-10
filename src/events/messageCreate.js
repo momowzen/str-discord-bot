@@ -28,15 +28,20 @@ module.exports = {
 
     // ── Auto-translate reply ──────────────────────────────────────
     if (channelSetting?.auto_translate_lang) {
-      const targetLang = channelSetting.auto_translate_lang;
+      const langs = channelSetting.auto_translate_lang.includes(',')
+        ? channelSetting.auto_translate_lang.split(',')
+        : [channelSetting.auto_translate_lang];
       const detected = await detectLanguage(textToTranslate);
-      if (detected && detected !== targetLang) {
-        const result = await translateText(textToTranslate, targetLang, detected);
-        if (result.text && result.text !== textToTranslate) {
-          await message.reply({
-            content: `*[auto-translated to ${targetLang}]*\n${result.text}`,
-            allowedMentions: { repliedUser: false },
-          });
+      if (detected) {
+        for (const targetLang of langs) {
+          if (targetLang === detected) continue;
+          const result = await translateText(textToTranslate, targetLang, detected);
+          if (result.text && result.text !== textToTranslate) {
+            await message.reply({
+              content: `*[ ${targetLang.toUpperCase()} ]*\n${result.text}`,
+              allowedMentions: { repliedUser: false },
+            });
+          }
         }
       }
     }
