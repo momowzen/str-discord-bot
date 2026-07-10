@@ -24,7 +24,7 @@ module.exports = {
         return interaction.reply({ content: 'This channel is not linked to any mirror.', ephemeral: true });
       }
       await interaction.client.db.removeMirrorLink(interaction.channelId);
-      return interaction.reply('Mirror link removed from this channel.');
+      return interaction.reply({ content: 'Mirror link removed from this channel.', ephemeral: true });
     }
 
     const target = interaction.options.getChannel('target');
@@ -45,6 +45,6 @@ module.exports = {
       interaction.channelId, interaction.guildId,
       target.id, target.guildId
     );
-    await interaction.reply(`Mirror link created between ${interaction.channel} ↔ ${target}. Messages will be auto-translated between channels.`);
+    await interaction.reply({ content: `Mirror link created between ${interaction.channel} ↔ ${target}. Messages will be auto-translated between channels.`, ephemeral: true });
   },
 };

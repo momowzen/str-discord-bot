@@ -46,7 +46,7 @@ module.exports = {
     const sub = interaction.options.getSubcommand();
     if (sub === 'off') {
       await interaction.client.db.disableChannelAutoTranslate(interaction.channelId);
-      return interaction.reply('Multi-translate disabled for this channel.');
+      return interaction.reply({ content: 'Multi-translate disabled for this channel.', ephemeral: true });
     }
 
     const langs = [];
@@ -66,8 +66,9 @@ module.exports = {
 
     await interaction.client.db.setChannelTriad(interaction.channelId, interaction.guildId, langs);
     const names = langs.map(l => `**${getLanguageName(l)}** (${l})`).join(', ');
-    await interaction.reply(
-      `Multi-translate enabled! Messages in any of these languages will be auto-translated to all others:\n${names}`
-    );
+    await interaction.reply({
+      content: `Multi-translate enabled! Messages in any of these languages will be auto-translated to all others:\n${names}`,
+      ephemeral: true,
+    });
   },
 };
