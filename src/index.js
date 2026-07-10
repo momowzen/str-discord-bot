@@ -4,7 +4,6 @@ const fs = require('fs');
 const path = require('path');
 const config = require('./config');
 const database = require('./database');
-const { terminateWorker } = require('./services/ocr');
 
 const client = new Client({
   intents: [
@@ -41,8 +40,6 @@ for (const file of fs.readdirSync(eventsPath).filter(f => f.endsWith('.js'))) {
 // Graceful shutdown
 const shutdown = async () => {
   console.log('Shutting down…');
-  await terminateWorker();
-  database.close();
   client.destroy();
   process.exit(0);
 };
