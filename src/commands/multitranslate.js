@@ -4,11 +4,11 @@ const { languages, getLanguageName } = require('../utils/languages');
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('multitranslate')
-    .setDescription('Auto-translate between two or more languages bidirectionally')
+    .setDescription('Auto-translate between one or more languages bidirectionally')
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
     .addSubcommand(sub => sub
       .setName('set')
-      .setDescription('Set languages to auto-translate between (e.g., en ja ko)')
+      .setDescription('Set language(s) to auto-translate to (e.g., en ja ko)')
       .addStringOption(opt => opt
         .setName('lang1')
         .setDescription('First language code')
@@ -60,15 +60,15 @@ module.exports = {
       }
     }
 
-    if (langs.length < 2) {
-      return interaction.reply({ content: 'You need at least 2 languages.', ephemeral: true });
+    if (langs.length < 1) {
+      return interaction.reply({ content: 'You need at least 1 language.', ephemeral: true });
     }
 
     await interaction.client.db.setChannelTriad(interaction.channelId, interaction.guildId, langs);
     const names = langs.map(l => `**${getLanguageName(l)}** (${l})`).join(', ');
-    await interaction.reply({
-      content: `Multi-translate enabled! Messages in any of these languages will be auto-translated to all others:\n${names}`,
-      ephemeral: true,
-    });
+    const msg = langs.length === 1
+      ? `Auto-translate enabled! All messages will be translated to ${names}.`
+      : `Multi-translate enabled! Messages will auto-translate between: ${names}`;
+    await interaction.reply({ content: msg, ephemeral: true });
   },
 };
