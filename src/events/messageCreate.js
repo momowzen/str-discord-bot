@@ -32,16 +32,28 @@ module.exports = {
         ? channelSetting.auto_translate_lang.split(',')
         : [channelSetting.auto_translate_lang];
       const detected = await detectLanguage(textToTranslate);
-      if (detected) {
+      if (detected && langs.length === 1 && detected !== langs[0]) {
+        const result = await translateText(textToTranslate, langs[0], detected);
+        if (result.text && result.text !== textToTranslate) {
+          await message.reply({
+            content: `*[translated to ${langs[0]}]*\n${result.text}`,
+            allowedMentions: { repliedUser: false },
+          });
+        }
+      } else if (detected && langs.length > 1) {
+        const parts = [];
         for (const targetLang of langs) {
           if (targetLang === detected) continue;
           const result = await translateText(textToTranslate, targetLang, detected);
           if (result.text && result.text !== textToTranslate) {
-            await message.reply({
-              content: `*[ ${targetLang.toUpperCase()} ]*\n${result.text}`,
-              allowedMentions: { repliedUser: false },
-            });
+            parts.push(`*[ ${targetLang.toUpperCase()} ]*\n${result.text}`);
           }
+        }
+        if (parts.length > 0) {
+          await message.reply({
+            content: `${parts.join('\n\n')}\n\n— *translated from ${detected}*`,
+            allowedMentions: { repliedUser: false },
+          });
         }
       }
     }
