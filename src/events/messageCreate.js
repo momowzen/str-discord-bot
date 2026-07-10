@@ -4,6 +4,7 @@ const { extractTextFromImage } = require('../services/ocr');
 module.exports = {
   name: 'messageCreate',
   async execute(message, client) {
+    console.log(`Message received from ${message.author.tag}: "${message.content}"`);
     if (message.author.bot) return;
     if (!message.guild) return;
 
