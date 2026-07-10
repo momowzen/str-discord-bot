@@ -1,5 +1,6 @@
 const { translateText, detectLanguage } = require('../services/translator');
 const { extractTextFromImage } = require('../services/ocr');
+const { getFlag } = require('../utils/languages');
 
 module.exports = {
   name: 'messageCreate',
@@ -36,7 +37,7 @@ module.exports = {
         const result = await translateText(textToTranslate, langs[0], detected);
         if (result.text && result.text !== textToTranslate) {
           await message.reply({
-            content: `*[translated to ${langs[0]}]*\n${result.text}`,
+            content: `${getFlag(langs[0])} ${result.text}\n\n— ${getFlag(detected)} *translated from ${detected}*`,
             allowedMentions: { repliedUser: false },
           });
         }
@@ -46,12 +47,12 @@ module.exports = {
           if (targetLang === detected) continue;
           const result = await translateText(textToTranslate, targetLang, detected);
           if (result.text && result.text !== textToTranslate) {
-            parts.push(`*[ ${targetLang.toUpperCase()} ]*\n${result.text}`);
+            parts.push(`${getFlag(targetLang)} ${result.text}`);
           }
         }
         if (parts.length > 0) {
           await message.reply({
-            content: `${parts.join('\n\n')}\n\n— *translated from ${detected}*`,
+            content: `${parts.join('\n\n')}\n\n— ${getFlag(detected)} *translated from ${detected}*`,
             allowedMentions: { repliedUser: false },
           });
         }

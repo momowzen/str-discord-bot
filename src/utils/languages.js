@@ -27,4 +27,37 @@ function getLanguageName(code) {
   return languages[code] || code;
 }
 
-module.exports = { languages, getLanguageName };
+const langToCountry = {
+  af: 'ZA', sq: 'AL', am: 'ET', ar: 'SA', hy: 'AM',
+  az: 'AZ', eu: 'ES', be: 'BY', bn: 'BD', bs: 'BA',
+  bg: 'BG', ca: 'ES', ceb: 'PH', ny: 'MW', 'zh-CN': 'CN',
+  'zh-TW': 'TW', co: 'FR', hr: 'HR', cs: 'CZ',
+  da: 'DK', nl: 'NL', en: 'GB', eo: 'EU', et: 'EE',
+  tl: 'PH', fi: 'FI', fr: 'FR', fy: 'NL', gl: 'ES',
+  ka: 'GE', de: 'DE', el: 'GR', gu: 'IN', ht: 'HT',
+  ha: 'NG', haw: 'US', he: 'IL', hi: 'IN', hmn: 'CN',
+  hu: 'HU', is: 'IS', ig: 'NG', id: 'ID', ga: 'IE',
+  it: 'IT', ja: 'JP', jw: 'ID', kn: 'IN', kk: 'KZ',
+  km: 'KH', rw: 'RW', ko: 'KR', ku: 'IQ', ky: 'KG',
+  lo: 'LA', la: 'VA', lv: 'LV', lt: 'LT', lb: 'LU',
+  mk: 'MK', mg: 'MG', ms: 'MY', ml: 'IN', mt: 'MT',
+  mi: 'NZ', mr: 'IN', mn: 'MN', my: 'MM', ne: 'NP',
+  no: 'NO', or: 'IN', ps: 'AF', fa: 'IR', pl: 'PL',
+  pt: 'PT', pa: 'IN', ro: 'RO', ru: 'RU', sm: 'WS',
+  gd: 'GB', sr: 'RS', st: 'LS', sn: 'ZW', sd: 'IN',
+  si: 'LK', sk: 'SK', sl: 'SI', so: 'SO', es: 'ES',
+  su: 'ID', sw: 'TZ', sv: 'SE', tg: 'TJ', ta: 'IN',
+  tt: 'RU', te: 'IN', th: 'TH', tr: 'TR', tk: 'TM',
+  uk: 'UA', ur: 'PK', ug: 'CN', uz: 'UZ', vi: 'VN',
+  cy: 'GB', xh: 'ZA', yi: 'IL', yo: 'NG', zu: 'ZA',
+};
+
+function getFlag(langCode) {
+  const cc = langToCountry[langCode];
+  if (!cc) return '';
+  const a = cc.charCodeAt(0) - 65 + 0x1F1E6;
+  const b = cc.charCodeAt(1) - 65 + 0x1F1E6;
+  return String.fromCodePoint(a) + String.fromCodePoint(b);
+}
+
+module.exports = { languages, getLanguageName, getFlag };
