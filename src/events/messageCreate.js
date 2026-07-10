@@ -37,7 +37,7 @@ module.exports = {
         const result = await translateText(textToTranslate, langs[0], detected);
         if (result.text && result.text !== textToTranslate) {
           await message.reply({
-            content: `${getFlag(langs[0])} ${result.text}\n\n— ${getFlag(detected)} *translated from ${detected}*`,
+            content: `${getFlag(langs[0])} ${result.text}`,
             allowedMentions: { repliedUser: false },
           });
         }
@@ -52,7 +52,7 @@ module.exports = {
         }
         if (parts.length > 0) {
           await message.reply({
-            content: `${parts.join('\n\n')}\n\n— ${getFlag(detected)} *translated from ${detected}*`,
+            content: parts.join('\n\n'),
             allowedMentions: { repliedUser: false },
           });
         }
