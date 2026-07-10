@@ -36,7 +36,10 @@ module.exports = {
       const result = await translateText(textToTranslate, langs[0], detected);
       if (result.text && result.text !== textToTranslate) {
         await message.reply({
-          content: `${getFlag(langs[0])}\n${result.text}`,
+          embeds: [{
+            color: 0x5865F2,
+            description: `${getFlag(langs[0])}\n${result.text}`,
+          }],
           allowedMentions: { repliedUser: false },
         });
       }
@@ -51,7 +54,10 @@ module.exports = {
       }
       if (parts.length > 0) {
         await message.reply({
-          content: parts.join('\n\n'),
+          embeds: [{
+            color: 0x5865F2,
+            description: parts.join('\n\n'),
+          }],
           allowedMentions: { repliedUser: false },
         });
       }
