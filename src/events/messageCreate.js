@@ -37,35 +37,22 @@ module.exports = {
         const result = await translateText(textToTranslate, langs[0], detected);
         if (result.text && result.text !== textToTranslate) {
           await message.reply({
-            embeds: [{
-              color: 0x5865F2,
-              description: result.text,
-              author: { name: `${getFlag(langs[0])} ${langs[0].toUpperCase()}` },
-              footer: { text: `Translated from ${detected}` },
-            }],
+            content: `${getFlag(langs[0])}\n${result.text}`,
             allowedMentions: { repliedUser: false },
           });
         }
       } else if (detected && langs.length > 1) {
-        const fields = [];
+        const parts = [];
         for (const targetLang of langs) {
           if (targetLang === detected) continue;
           const result = await translateText(textToTranslate, targetLang, detected);
           if (result.text && result.text !== textToTranslate) {
-            fields.push({
-              name: `${getFlag(targetLang)} ${targetLang.toUpperCase()}`,
-              value: result.text.substring(0, 1024),
-              inline: true,
-            });
+            parts.push(`${getFlag(targetLang)}\n${result.text}`);
           }
         }
-        if (fields.length > 0) {
+        if (parts.length > 0) {
           await message.reply({
-            embeds: [{
-              color: 0x5865F2,
-              fields,
-              footer: { text: `Translated from ${detected}` },
-            }],
+            content: parts.join('\n\n'),
             allowedMentions: { repliedUser: false },
           });
         }
