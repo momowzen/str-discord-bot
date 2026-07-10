@@ -7,12 +7,12 @@ const MENTION_RE = /@(everyone|here)|<[@#][!&]?\d+>|<a?:\w+:\d+>/g;
 function preserveMentions(text, store) {
   return text.replace(MENTION_RE, m => {
     const idx = store.push(m);
-    return `\x00MENTION_${idx - 1}\x00`;
+    return `⟪M${idx - 1}⟫`;
   });
 }
 
 function restoreMentions(text, store) {
-  return text.replace(/\x00MENTION_(\d+)\x00/g, (_, i) => store[+i] || '');
+  return text.replace(/⟪M(\d+)⟫/g, (_, i) => store[+i] || '');
 }
 
 module.exports = {
@@ -55,7 +55,7 @@ module.exports = {
             color: 0x5865F2,
             description: `${getFlag(langs[0])}\n${translated}`,
           }],
-          allowedMentions: { repliedUser: false },
+          allowedMentions: { parse: [] },
         });
       }
     } else if (langs.length > 1) {
@@ -73,7 +73,7 @@ module.exports = {
             color: 0x5865F2,
             description: parts.join('\n\n'),
           }],
-          allowedMentions: { repliedUser: false },
+          allowedMentions: { parse: [] },
         });
       }
     }
