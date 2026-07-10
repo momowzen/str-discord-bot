@@ -21,7 +21,8 @@ async function detectLanguage(text) {
     return typeof result.language === 'string'
       ? result.language
       : result.language?.language || null;
-  } catch {
+  } catch (err) {
+    console.error('Detection error:', err.message);
     return null;
   }
 }

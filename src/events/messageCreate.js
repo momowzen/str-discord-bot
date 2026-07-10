@@ -31,14 +31,19 @@ module.exports = {
     // ── Auto-translate reply ──────────────────────────────────────
     if (channelSetting?.auto_translate_lang) {
       const targetLang = channelSetting.auto_translate_lang;
+      console.log(`Starting detection for "${textToTranslate}" target=${targetLang}`);
       const detected = await detectLanguage(textToTranslate);
+      console.log(`Detected language: ${detected}`);
       if (detected && detected !== targetLang) {
+        console.log(`Translating to ${targetLang}...`);
         const result = await translateText(textToTranslate, targetLang, detected);
+        console.log(`Translation result: text=${result.text?.substring(0,50)}`);
         if (result.text && result.text !== textToTranslate) {
           await message.reply({
             content: `*[auto-translated to ${targetLang}]*\n${result.text}`,
             allowedMentions: { repliedUser: false },
           });
+          console.log('Reply sent successfully');
         }
       }
     }
