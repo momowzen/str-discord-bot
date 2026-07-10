@@ -1,83 +1,73 @@
-const Database = require('better-sqlite3');
-const path = require('path');
 const fs = require('fs');
+const path = require('path');
 
-const dbDir = path.join(__dirname, '..', 'data');
-if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true });
+const DB_PATH = path.join(__dirname, '..', 'data', 'db.json');
 
-const db = new Database(path.join(dbDir, 'str.db'));
-db.pragma('journal_mode = WAL');
+function load() {
+  try {
+    return JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+  } catch {
+    return { guilds: {}, channels: {}, mirrors: [] };
+  }
+}
 
-db.exec(`
-  CREATE TABLE IF NOT EXISTS guild_settings (
-    guild_id TEXT PRIMARY KEY,
-    default_lang TEXT NOT NULL DEFAULT 'en'
-  );
-  CREATE TABLE IF NOT EXISTS channel_settings (
-    channel_id TEXT PRIMARY KEY,
-    guild_id TEXT NOT NULL,
-    auto_translate_lang TEXT
-  );
-  CREATE TABLE IF NOT EXISTS mirror_links (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    channel_a TEXT NOT NULL,
-    channel_b TEXT NOT NULL,
-    guild_a TEXT NOT NULL,
-    guild_b TEXT NOT NULL,
-    active INTEGER NOT NULL DEFAULT 1
-  );
-`);
-
-const stmts = {
-  getGuild: db.prepare('SELECT * FROM guild_settings WHERE guild_id = ?'),
-  insertGuild: db.prepare('INSERT INTO guild_settings (guild_id) VALUES (?)'),
-  setGuildLang: db.prepare('UPDATE guild_settings SET default_lang = ? WHERE guild_id = ?'),
-  getChannel: db.prepare('SELECT * FROM channel_settings WHERE channel_id = ?'),
-  upsertChannel: db.prepare(
-    'INSERT INTO channel_settings (channel_id, guild_id, auto_translate_lang) VALUES (?, ?, ?) ON CONFLICT(channel_id) DO UPDATE SET auto_translate_lang = excluded.auto_translate_lang'
-  ),
-  clearChannelLang: db.prepare('UPDATE channel_settings SET auto_translate_lang = NULL WHERE channel_id = ?'),
-  insertMirror: db.prepare('INSERT INTO mirror_links (channel_a, channel_b, guild_a, guild_b) VALUES (?, ?, ?, ?)'),
-  getMirror: db.prepare('SELECT * FROM mirror_links WHERE (channel_a = ? OR channel_b = ?) AND active = 1'),
-  removeMirror: db.prepare('DELETE FROM mirror_links WHERE channel_a = ? OR channel_b = ?'),
-};
+function save(data) {
+  const dir = path.dirname(DB_PATH);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(DB_PATH, JSON.stringify(data));
+}
 
 module.exports = {
   getGuildSetting(guildId) {
-    let row = stmts.getGuild.get(guildId);
-    if (!row) {
-      stmts.insertGuild.run(guildId);
-      row = stmts.getGuild.get(guildId);
+    const data = load();
+    if (!data.guilds[guildId]) {
+      data.guilds[guildId] = { default_lang: 'en' };
+      save(data);
     }
-    return row;
+    return { guild_id: guildId, default_lang: data.guilds[guildId].default_lang };
   },
   setGuildLang(guildId, lang) {
-    this.getGuildSetting(guildId);
-    stmts.setGuildLang.run(lang, guildId);
+    const data = load();
+    if (!data.guilds[guildId]) data.guilds[guildId] = {};
+    data.guilds[guildId].default_lang = lang;
+    save(data);
   },
   getChannelSetting(channelId) {
-    return stmts.getChannel.get(channelId) || null;
+    const data = load();
+    const ch = data.channels[channelId];
+    return ch ? { channel_id: channelId, ...ch } : null;
   },
   setChannelAutoTranslate(channelId, guildId, lang) {
-    stmts.upsertChannel.run(channelId, guildId, lang);
+    const data = load();
+    if (!data.channels[channelId]) data.channels[channelId] = {};
+    data.channels[channelId].guild_id = guildId;
+    data.channels[channelId].auto_translate_lang = lang;
+    save(data);
   },
   disableChannelAutoTranslate(channelId) {
-    stmts.clearChannelLang.run(channelId);
+    const data = load();
+    if (data.channels[channelId]) {
+      data.channels[channelId].auto_translate_lang = undefined;
+      save(data);
+    }
   },
   createMirrorLink(channelA, guildA, channelB, guildB) {
-    stmts.insertMirror.run(channelA, guildA, channelB, guildB);
+    const data = load();
+    data.mirrors.push({ channel_a: channelA, guild_a: guildA, channel_b: channelB, guild_b: guildB, active: true });
+    save(data);
   },
   getMirrorForChannel(channelId) {
-    const row = stmts.getMirror.get(channelId, channelId);
+    const data = load();
+    const row = data.mirrors.find(m => m.active && (m.channel_a === channelId || m.channel_b === channelId));
     if (!row) return null;
     const targetChannel = row.channel_a === channelId ? row.channel_b : row.channel_a;
     const targetGuild = row.channel_a === channelId ? row.guild_b : row.guild_a;
-    return { targetChannel, targetGuild, id: row.id };
+    return { targetChannel, targetGuild, id: row.channel_a + row.channel_b };
   },
   removeMirrorLink(channelId) {
-    stmts.removeMirror.run(channelId, channelId);
+    const data = load();
+    data.mirrors = data.mirrors.filter(m => m.channel_a !== channelId && m.channel_b !== channelId);
+    save(data);
   },
-  close() {
-    db.close();
-  },
+  close() {},
 };
