@@ -11,6 +11,7 @@ module.exports = {
     const channelSetting = client.db.getChannelSetting(message.channelId);
     const mirror = client.db.getMirrorForChannel(message.channelId);
     const guildSetting = client.db.getGuildSetting(message.guildId);
+    console.log(`Settings: channel=${message.channelId} autoTranslate=${channelSetting?.auto_translate_lang} guildDefault=${guildSetting.default_lang}`);
 
     // Gather text — message content + OCR from attached images
     let textToTranslate = message.content;
