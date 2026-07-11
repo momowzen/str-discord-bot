@@ -1,5 +1,4 @@
 const { translateText, detectLanguage } = require('../services/translator');
-const { extractTextFromImage } = require('../services/ocr');
 const { getFlag } = require('../utils/languages');
 
 const MENTION_RE = /@(everyone|here)|<[@#][!&]?\d+>|<a?:\w+:\d+>/g;
@@ -25,18 +24,7 @@ module.exports = {
     if (!channelSetting?.auto_translate_lang) return;
 
     const mentions = [];
-    let textToTranslate = preserveMentions(message.content, mentions);
-
-    const imageAttachments = message.attachments.filter(a => a.contentType?.startsWith('image/'));
-    if (imageAttachments.size > 0) {
-      for (const [, attachment] of imageAttachments) {
-        const extracted = await extractTextFromImage(attachment.url);
-        if (extracted) {
-          textToTranslate += (textToTranslate ? '\n' : '') + extracted;
-        }
-      }
-    }
-
+    const textToTranslate = preserveMentions(message.content, mentions);
     if (!textToTranslate) return;
 
     const langs = channelSetting.auto_translate_lang.includes(',')
