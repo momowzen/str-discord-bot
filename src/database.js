@@ -106,20 +106,17 @@ module.exports = {
     data.channels[channelId].auto_translate_lang = lang;
     save(data);
   },
-  async disableChannelAutoTranslate(channelId, guildId) {
+  async disableChannelAutoTranslate(channelId) {
     if (TURSO_URL) {
       await ensureTables();
-      await turso(
-        'INSERT OR REPLACE INTO channel_settings (channel_id, guild_id, auto_translate_lang) VALUES (?, ?, ?)',
-        [channelId, guildId, '__disabled__']
-      );
+      await turso('DELETE FROM channel_settings WHERE channel_id = ?', [channelId]);
       return;
     }
     const data = load();
-    if (!data.channels[channelId]) data.channels[channelId] = {};
-    data.channels[channelId].guild_id = guildId;
-    data.channels[channelId].auto_translate_lang = '__disabled__';
-    save(data);
+    if (data.channels[channelId]) {
+      data.channels[channelId].auto_translate_lang = undefined;
+      save(data);
+    }
   },
   async setChannelTriad(channelId, guildId, langs) {
     const str = langs.join(',');
