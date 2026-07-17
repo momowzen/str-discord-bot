@@ -21,15 +21,17 @@ module.exports = {
     if (!message.guild) return;
 
     const channelSetting = await client.db.getChannelSetting(message.channelId);
-    if (!channelSetting?.auto_translate_lang) return;
+    if (channelSetting?.auto_translate_lang === '__disabled__') return;
 
     const mentions = [];
     const textToTranslate = preserveMentions(message.content, mentions);
     if (!textToTranslate) return;
 
-    const langs = channelSetting.auto_translate_lang.includes(',')
-      ? channelSetting.auto_translate_lang.split(',')
-      : [channelSetting.auto_translate_lang];
+    const langs = channelSetting?.auto_translate_lang
+      ? channelSetting.auto_translate_lang.includes(',')
+        ? channelSetting.auto_translate_lang.split(',')
+        : [channelSetting.auto_translate_lang]
+      : ['en', 'ja', 'ko'];
 
     const detected = await detectLanguage(textToTranslate);
     if (!detected) return;

@@ -2,7 +2,7 @@
   "name": "str-discord-bot",
   "version": "1.0.0",
   "private": true,
-  "description": "Multilingual Discord translation bot with auto-translate, mirror bridging, and OCR",
+  "description": "Multilingual Discord translation bot with auto-translate",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
@@ -11,6 +11,6 @@
   "dependencies": {
     "discord.js": "^14.18.0",
     "dotenv": "^16.4.7",
-    "google-translate-api-x": "^10.7.0"
+    "google-translate-api-x": "^10.7.3"
   }
 }

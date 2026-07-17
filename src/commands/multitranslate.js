@@ -45,7 +45,7 @@ module.exports = {
   async execute(interaction) {
     const sub = interaction.options.getSubcommand();
     if (sub === 'off') {
-      await interaction.client.db.disableChannelAutoTranslate(interaction.channelId);
+      await interaction.client.db.disableChannelAutoTranslate(interaction.channelId, interaction.guildId);
       return interaction.reply({ content: 'Multi-translate disabled for this channel.', ephemeral: true });
     }
 
