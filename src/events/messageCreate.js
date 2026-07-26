@@ -57,10 +57,7 @@ module.exports = {
       if (result.text && result.text !== textToTranslate) {
         const translated = restoreMentions(result.text, mentions);
         await message.reply({
-          embeds: [{
-            color: 0x5865F2,
-            description: `${getFlag(langs[0])}\n${translated}`,
-          }],
+          content: `\`\`\`\n${getFlag(langs[0])} ${translated}\n\`\`\``,
           allowedMentions: { parse: [] },
         });
       }
@@ -70,15 +67,12 @@ module.exports = {
         if (targetLang === detected) continue;
         const result = await translateText(textToTranslate, targetLang, detected);
         if (result.text && result.text !== textToTranslate) {
-          parts.push(`${getFlag(targetLang)}\n${restoreMentions(result.text, mentions)}`);
+          parts.push(`${getFlag(targetLang)} ${restoreMentions(result.text, mentions)}`);
         }
       }
       if (parts.length > 0) {
         await message.reply({
-          embeds: [{
-            color: 0x5865F2,
-            description: parts.join('\n\n'),
-          }],
+          content: `\`\`\`\n${parts.join('\n')}\n\`\`\``,
           allowedMentions: { parse: [] },
         });
       }
