@@ -1,5 +1,5 @@
 const { translateText, detectLanguage } = require('../services/translator');
-const { getLanguageName } = require('../utils/languages');
+const { getNativeName } = require('../utils/languages');
 
 const MENTION_RE = /@(everyone|here)|<[@#][!&]?\d+>|<a?:\w+:\d+>/g;
 
@@ -40,7 +40,7 @@ module.exports = {
       if (result.text && result.text !== textToTranslate) {
         const translated = restoreMentions(result.text, mentions);
         await message.reply({
-          content: `\`\`\`\n${getLanguageName(langs[0])} (${langs[0]})\n${translated}\n\`\`\``,
+          content: `\`\`\`\n${getNativeName(langs[0])}\n${translated}\n\`\`\``,
           allowedMentions: { parse: [] },
         });
       }
@@ -50,7 +50,7 @@ module.exports = {
         if (targetLang === detected) continue;
         const result = await translateText(textToTranslate, targetLang, detected);
         if (result.text && result.text !== textToTranslate) {
-          parts.push(`${getLanguageName(targetLang)} (${targetLang})\n${restoreMentions(result.text, mentions)}`);
+          parts.push(`${getNativeName(targetLang)}\n${restoreMentions(result.text, mentions)}`);
         }
       }
       if (parts.length > 0) {

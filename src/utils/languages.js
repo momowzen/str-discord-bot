@@ -1,3 +1,28 @@
+const nativeNames = {
+  af: 'Afrikaans', sq: 'Shqip', am: 'አማርኛ', ar: 'العربية', hy: 'Հայերեն',
+  az: 'Azərbaycan', eu: 'Euskara', be: 'Беларуская', bn: 'বাংলা', bs: 'Bosanski',
+  bg: 'Български', ca: 'Català', ceb: 'Cebuano', ny: 'Chichewa', 'zh-CN': '简体中文',
+  'zh-TW': '繁體中文', co: 'Corsu', hr: 'Hrvatski', cs: 'Čeština',
+  da: 'Dansk', nl: 'Nederlands', en: 'English', eo: 'Esperanto', et: 'Eesti',
+  tl: 'Filipino', fi: 'Suomi', fr: 'Français', fy: 'Frysk', gl: 'Galego',
+  ka: 'ქართული', de: 'Deutsch', el: 'Ελληνικά', gu: 'ગુજરાતી', ht: 'Kreyòl Ayisyen',
+  ha: 'Hausa', haw: 'ʻŌlelo Hawaiʻi', he: 'עברית', hi: 'हिन्दी', hmn: 'Hmoob',
+  hu: 'Magyar', is: 'Íslenska', ig: 'Igbo', id: 'Bahasa Indonesia', ga: 'Gaeilge',
+  it: 'Italiano', ja: '日本語', jw: 'Basa Jawa', kn: 'ಕನ್ನಡ', kk: 'Қазақ',
+  km: 'ខ្មែរ', rw: 'Kinyarwanda', ko: '한국어', ku: 'Kurdî', ky: 'Кыргызча',
+  lo: 'ລາວ', la: 'Latina', lv: 'Latviešu', lt: 'Lietuvių', lb: 'Lëtzebuergesch',
+  mk: 'Македонски', mg: 'Malagasy', ms: 'Bahasa Melayu', ml: 'മലയാളം', mt: 'Malti',
+  mi: 'Māori', mr: 'मराठी', mn: 'Монгол', my: 'မြန်မာ', ne: 'नेपाली',
+  no: 'Norsk', or: 'ଓଡ଼ିଆ', ps: 'پښتو', fa: 'فارسی', pl: 'Polski',
+  pt: 'Português', pa: 'ਪੰਜਾਬੀ', ro: 'Română', ru: 'Русский', sm: 'Gagana Samoa',
+  gd: 'Gàidhlig', sr: 'Српски', st: 'Sesotho', sn: 'Shona', sd: 'سنڌي',
+  si: 'සිංහල', sk: 'Slovenčina', sl: 'Slovenščina', so: 'Soomaali', es: 'Español',
+  su: 'Basa Sunda', sw: 'Kiswahili', sv: 'Svenska', tg: 'Тоҷикӣ', ta: 'தமிழ்',
+  tt: 'Татар', te: 'తెలుగు', th: 'ไทย', tr: 'Türkçe', tk: 'Türkmen',
+  uk: 'Українська', ur: 'اردو', ug: 'ئۇيغۇرچە', uz: 'Oʻzbek', vi: 'Tiếng Việt',
+  cy: 'Cymraeg', xh: 'IsiXhosa', yi: 'ייִדיש', yo: 'Yorùbá', zu: 'isiZulu',
+};
+
 const languages = {
   af: 'Afrikaans', sq: 'Albanian', am: 'Amharic', ar: 'Arabic', hy: 'Armenian',
   az: 'Azerbaijani', eu: 'Basque', be: 'Belarusian', bn: 'Bengali', bs: 'Bosnian',
@@ -25,6 +50,10 @@ const languages = {
 
 function getLanguageName(code) {
   return languages[code] || code;
+}
+
+function getNativeName(code) {
+  return nativeNames[code] || getLanguageName(code);
 }
 
 const langToCountry = {
@@ -60,4 +89,4 @@ function getFlag(langCode) {
   return String.fromCodePoint(a) + String.fromCodePoint(b);
 }
 
-module.exports = { languages, getLanguageName, getFlag };
+module.exports = { languages, getLanguageName, getNativeName, getFlag };
