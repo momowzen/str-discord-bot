@@ -16,8 +16,8 @@ async function translateText(text, targetLang, sourceLang) {
 
 async function detectLanguage(text) {
   try {
-    const result = await translator.detectLanguage(text);
-    return result?.[0]?.language?.toLowerCase() || null;
+    const result = await translator.translateText(text, null, 'EN');
+    return result.detectedSourceLang?.toLowerCase() || null;
   } catch (err) {
     console.error('Detection error:', err.message);
     return null;

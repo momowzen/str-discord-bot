@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, MessageFlags } = require('discord.js');
 const { languages, getLanguageName } = require('../utils/languages');
 
 module.exports = {
@@ -47,7 +47,7 @@ module.exports = {
 
     if (sub === 'off') {
       await interaction.client.db.disableChannelAutoTranslate(interaction.channelId);
-      return interaction.reply({ content: 'Multi-translate disabled for this channel.', ephemeral: true });
+      return interaction.reply({ content: 'Multi-translate disabled for this channel.', flags: MessageFlags.Ephemeral });
     }
 
     const langs = [];
@@ -55,14 +55,14 @@ module.exports = {
       const code = interaction.options.getString(`lang${i}`);
       if (code) {
         if (!languages[code]) {
-          return interaction.reply({ content: `Unsupported language code: \`${code}\`.`, ephemeral: true });
+          return interaction.reply({ content: `Unsupported language code: \`${code}\`.`, flags: MessageFlags.Ephemeral });
         }
         langs.push(code);
       }
     }
 
     if (langs.length < 1) {
-      return interaction.reply({ content: 'You need at least 1 language.', ephemeral: true });
+      return interaction.reply({ content: 'You need at least 1 language.', flags: MessageFlags.Ephemeral });
     }
 
     await interaction.client.db.setChannelTriad(interaction.channelId, interaction.guildId, langs);
@@ -70,6 +70,6 @@ module.exports = {
     const msg = langs.length === 1
       ? `Auto-translate enabled! All messages will be translated to ${names}.`
       : `Multi-translate enabled! Messages will auto-translate between: ${names}`;
-    await interaction.reply({ content: msg, ephemeral: true });
+    await interaction.reply({ content: msg, flags: MessageFlags.Ephemeral });
   },
 };
