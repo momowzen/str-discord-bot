@@ -1,7 +1,6 @@
 const { translateText, detectLanguage } = require('../services/translator');
 const { getFlag } = require('../utils/languages');
 
-const PREFIX = '!';
 const MENTION_RE = /@(everyone|here)|<[@#][!&]?\d+>|<a?:\w+:\d+>/g;
 
 function preserveMentions(text, store) {
@@ -20,22 +19,6 @@ module.exports = {
   async execute(message, client) {
     if (message.author.bot) return;
     if (!message.guild) return;
-
-    // Handle prefix commands
-    if (message.content.startsWith(PREFIX)) {
-      const args = message.content.slice(PREFIX.length).trim().split(/\s+/);
-      const cmdName = args.shift().toLowerCase();
-      const command = client.commands.get(cmdName);
-      if (command) {
-        try {
-          await command.execute(message, args, client);
-        } catch (err) {
-          console.error('Command error:', err);
-          message.reply('An error occurred while executing that command.');
-        }
-      }
-      return;
-    }
 
     // Auto-translate
     const channelSetting = await client.db.getChannelSetting(message.channelId);
