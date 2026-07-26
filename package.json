@@ -9,8 +9,8 @@
     "dev": "node --watch src/index.js"
   },
   "dependencies": {
+    "deepl-node": "^1.27.0",
     "discord.js": "^14.18.0",
-    "dotenv": "^16.4.7",
-    "google-translate-api-x": "^10.7.3"
+    "dotenv": "^16.4.7"
   }
 }

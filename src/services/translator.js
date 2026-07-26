@@ -1,12 +1,13 @@
-const { translate } = require('google-translate-api-x');
+const deepl = require('deepl-node');
+
+const translator = new deepl.Translator(process.env.DEEPL_API_KEY);
 
 async function translateText(text, targetLang, sourceLang) {
-  const opts = { to: targetLang };
-  if (sourceLang && sourceLang !== 'auto') opts.from = sourceLang;
   try {
-    const result = await translate(text, opts);
-    const detected = result.from?.language?.iso || sourceLang || 'auto';
-    return { text: result.text, detectedLang: detected };
+    const src = sourceLang && sourceLang !== 'auto' ? sourceLang.toUpperCase() : null;
+    const result = await translator.translateText(text, src, targetLang.toUpperCase());
+    const detected = sourceLang === 'auto' ? null : (sourceLang || null);
+    return { text: result.text, detectedLang: detected || result.detectedSourceLang?.toLowerCase() || null };
   } catch (err) {
     console.error('Translation error:', err.message);
     return { text: null, detectedLang: null };
@@ -15,8 +16,8 @@ async function translateText(text, targetLang, sourceLang) {
 
 async function detectLanguage(text) {
   try {
-    const result = await translate(text, { to: 'en' });
-    return result.from?.language?.iso || null;
+    const result = await translator.detectLanguage(text);
+    return result?.[0]?.language?.toLowerCase() || null;
   } catch (err) {
     console.error('Detection error:', err.message);
     return null;
